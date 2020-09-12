@@ -1,357 +1,469 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <style>
-            body {
-                font-family: 'Geneva', sans-serif;
-                margin: 0px;
-            }
-            div.header {
-                background: rgb(255,155,74);
-                background: linear-gradient(90deg, rgba(255,122,15,1) 0%, rgba(255,210,61,1) 100%);
-                color: white;
-            }
-            h3.header {
-                margin-bottom: 0px;
-                padding-left: 15px;
-                padding-top: 15px;
-                margin-top: 0px;
-            }
-            h2.header {
-                margin-top: 5px;
-                margin-bottom: 30px; 
-                padding-bottom: 15px;
-                padding-left: 25px;
-            }
-            .step {
-                margin: 15px;
-                border: 1px solid grey;
-                border-radius: 4px;
-                padding: 5px;
-                min-height: 120px;
-                min-width: 400px;
-            }
-            .step-header {
-                color: #ff7a0f;
-                margin: 3px 5px 5px 5px;
-                font-weight: bold;
-            }
-            .container {
-                display: flex;
-                flex-direction: row;
-            }
-            .progress {
-                margin-top: 50px;
-                margin-bottom: 15px;
-                margin-left: 15px;
-            }
-            .bubble-container {
-                display: flex;
-                flex-direction: column;
-                justify-content: space-between;
-                height: 375px;
-            }
-            .vert-line {
-                border-left: 2px solid lightgrey;
-                position: fixed;
-                height: 375px;
-                left: 35px;
-            }
-            .steps {
-                display: flex;
-                flex-direction: column;
-                
-            }
-            .active, .incomplete, .complete {
-                background: white;
-                height: 40px;
-                width: 40px;
-                border-radius: 50px;
-                z-index: 2;
-                border: 2px solid lightgrey;
-                color: lightgrey;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-            }
-            .active {
-                background: #ffd23d;
-                color: white;
-                border-color: #ffd23d;
-            }
-            .complete {
-                background: rgba(255,122,15,1);
-                color: white;
-                border-color: rgba(255,122,15,1);
-            }
-            #months{
-                padding: 6px 0px 6px 10px;
-                font-family: 'Geneva', sans-serif;
-                font-size: 16px;
-                border-radius: 4px;
-                margin-left: 15px;
-                margin-top: 15px;
-                min-width: 122px;
-            }
-            .upload-btn-wrapper {
-                position: relative;
-                overflow: hidden;
-                display: inline-block;
-                margin-left: 15px;
-                margin-top: 15px;
-            }
 
-            .btn {
-                border: 1px solid gray;
-                color: gray;
-                background-color: white;
-                padding: 8px 20px;
-                border-radius: 4px;
-                font-size: 16px;
-            }
+<head>
+	<style>
+		body {
+			font-family: 'Geneva', sans-serif;
+			margin: 0px;
+		}
 
-            .success{
-                color: black;
-                background-color: white;
-                padding: 8px 20px;
-                border-radius: 4px;
-                font-size: 16px;
-                border: 1px solid grey;
-                min-width: 122px;
-            }
+		li {
+			margin-bottom: 15px;
+		}
 
-            .upload-btn-wrapper input[type=file] {
-                font-size: 100px;
-                position: absolute;
-                left: 0;
-                top: 0;
-                opacity: 0;
-            }
-            
+		div.header {
+			background: rgb(255, 155, 74);
+			background: linear-gradient(90deg, rgba(255, 122, 15, 1) 0%, rgba(255, 210, 61, 1) 100%);
+			color: white;
+		}
 
-        </style>
-    </head>
-    <body>
-        <div class="header">
-            <h3 class="header">Hi Susan,</h3>
-            <h2 class="header">Welcome to your monthly patient tally.</h2>
-        </div>
-        <div class="container">       
-        <div class="progress">
-            <div class="vert-line"></div>
-            <div class="bubble-container">
-            <div class="active" id="m"><p className="stepLabel">1</p></div>
-            <div class="incomplete" id="square"><p className="stepLabel">2</p></div>
-            <div class="incomplete" id="patients"><p className="stepLabel">3</p></div>
-        </div>
-        </div>
-        <div class="steps">
-        <div class="step">
-            <div class="step-header" id="1">
-                <h2 class="step-header">Select billing month</h2>
-            </div>
-            <select name="months" id="months" onchange="updateBubble('m')">
-                <option> </option>
-                <option value="0">January</option>
-                <option value="1">February</option>
-                <option value="2">March</option>
-                <option value="3">April</option>
-                <option value="4">May</option>
-                <option value="5">June</option>
-                <option value="6">July</option>
-                <option value="7">August</option>
-                <option value="8">September</option>
-                <option value="9">October</option>
-                <option value="10">November</option>
-                <option value="11">December</option>
-            </select>
-            <br/>
-        </div>
-        <div class="step">
-            <div class="step-header" id="2">
-                <h2 class="step-header">Upload file from Square</h2>
-            </div>
-            <div class="upload-btn-wrapper">
-                <button class="btn" id="square">Choose file</button>
-                <input type="file" id="uploader" name="square" accept=".csv" onchange='read(this)'/>
-            </div>
-            <br/>
-        </div>
+		h3.header {
+			margin-bottom: 0px;
+			padding-left: 15px;
+			padding-top: 15px;
+			margin-top: 0px;
+		}
 
-        <div class="step">
-            <div class="step-header" id="3">
-                <h2 class="step-header">Upload patient data file</h2>
-            </div>
-            <div class="upload-btn-wrapper">
-                <button class="btn" id="patients">Choose file</button>
-                <input type="file" id="uploader" name="patients" accept=".csv" onchange='read(this)'/>
-            </div>
-        <br/>
-        </div>
-    </div>
-    </div>
+		h2.header {
+			margin-top: 5px;
+			margin-bottom: 30px;
+			padding-bottom: 15px;
+			padding-left: 25px;
+		}
 
-       
-        <button onclick='showData()'>Show</button>
-        <script>
-            function month(date) {
-                return (new Date(date).getMonth())
-            }
-            
-            function squareFilter(json) {
-                const requestedDate = Number(document.querySelector('#months').value);
-                const filteredData = [];
-                let currentDate = requestedDate;
-                let idx = 0;
-                let limit = currentDate === 0 ? 12 : currentDate - 1;
-            
-                while (currentDate !== limit) {
-                    if (month(json[idx].start) === requestedDate) filteredData.push(json[idx]);
-                    idx++;
-                    currentDate = month(json[idx+1].start);
-                }
-                return filteredData;
-            }
-            
+		.step {
+			margin: 15px;
+			border: 1px solid grey;
+			border-radius: 4px;
+			padding: 5px;
+			min-height: 120px;
+			min-width: 400px;
+		}
 
-            function csvJSON(csvText) {
-                let lines = [];
-                const linesArray = csvText.split('\n');
-                // for trimming and deleting extra space 
-                linesArray.forEach((e) => {
-                    const row = e.replace(/[\s]+[,]+|[,]+[\s]+/g, ',').trim();
-                    lines.push(row);
-                });
-                // for removing empty record
-                lines.splice(lines.length, 1);
-                const result = [];
-                const headers = lines[0].split(",");
-                for (let i = 1; i < lines.length; i++) {
-                    const obj = {};
-                    const currentline = lines[i].split(",");
-                    for (let j = 0; j < headers.length; j++) {
-                    obj[headers[j]] = currentline[j];
-                    }
-                    result.push(obj);
-                }
-                return result;
-            }
+		.step-header {
+			color: #ff7a0f;
+			margin: 3px 5px 5px 5px;
+			font-weight: bold;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+		}
 
-            let squareData = {};
-            let patientData = {};
+		.help-btn {
+			border-radius: 50%;
+			height: 25px;
+			width: 25px;
+			border: none;
+			background-color: #ff7a0f;
+			color: white;
+		}
 
-            function updateBtn(id) {
-                const btn = document.querySelector(`.btn#${id}`)
-                btn.setAttribute('class', 'success')
-                btn.innerHTML = 'Success!'
-                updateBubble(id)
-            }
+		.container {
+			display: flex;
+			flex-direction: row;
+		}
 
-            function updateBubble(id){
-                const bubble = document.getElementById(`${id}`)
-                bubble.setAttribute('class', 'complete')
-                bubble.firstElementChild.innerText ='✓'
-                if (id !== 'patients'){
-                    const next = id === 'm' ? 'square' : 'patients'
-                    const nextBubble = document.getElementById(`${next}`)
-                    nextBubble.setAttribute('class', `active`)
-                }
-            }
+		.progress {
+			margin-top: 50px;
+			margin-bottom: 15px;
+			margin-left: 15px;
+		}
 
-            function read(input) {
-                const csv = input.files[0]
-                const reader = new FileReader();
-           
-                reader.readAsText(csv);
-                reader.onload = function() {
-                    const text = reader.result;
-                    updateBtn(input.name);
-                    const csvToJson = csvJSON(text);
-                    if (input.name === "square"){
-                        squareData = squareFilter(csvToJson);
-                    } else patientData = csvToJson;
-                    }
-            }
+		.bubble-container {
+			display: flex;
+			flex-direction: column;
+			justify-content: space-between;
+			height: 375px;
+		}
 
-            function includeEachOther(first, second){
-                return (first.includes(second) || second.includes(first))
-            }
+		.vert-line {
+			border-left: 2px solid lightgrey;
+			position: fixed;
+			height: 375px;
+			left: 35px;
+		}
 
-            function standardizeFirst(string){
-                return (string.toLowerCase().trim())
-            }
+		.steps {
+			display: flex;
+			flex-direction: column;
+			width: 415px;
+		}
 
-            function standardizeLast(string){
-                return (string.toLowerCase().trim().replace('-', ' '))
-            }
+		.active,
+		.incomplete,
+		.complete {
+			background: white;
+			height: 40px;
+			width: 40px;
+			border-radius: 50px;
+			z-index: 2;
+			border: 2px solid lightgrey;
+			color: lightgrey;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+		}
 
-            function matchPatient(record, appointment) {
-                //from the patient record
-                firstName = standardizeFirst(record.first_name)
-                lastName = standardizeLast(record.last_name)
-                if (record.alternate_name) altName = standardizeFirst(record.alternate_name)
+		.active {
+			background: #ffd23d;
+			color: white;
+			border-color: #ffd23d;
+		}
 
-                //from the appointment (info usually entered by client)
-                let apptName = standardizeLast(appointment.client_name).split(' ')
-                
-                //perfect match
-                if (firstName === apptName[0] && lastName === apptName[1]) {
-                    return true;
-                }
-                //multiple last names
-                else if (includeEachOther(apptName, lastName) || (apptName[2] && (lastName.replace(/\W/, '') === [apptName[1], apptName[2]].join('')))) {
-                    return true;
-                }
-                else if (lastName.split(' ').length > 1 && lastName.split(' ').includes(apptName[1])) {
-                      return true;
-                  }
-               //partial name 
-                else if (lastName == apptName[1] && includeEachOther(apptName[0], firstName)) {
-                    return true;
-                }
-                // alternate name
-                else if (lastName == apptName[1] && altName && includeEachOther(apptName[0], altName)) {
-                    return true;
-                }
-                // no last name - use email to confirm identity
-                else if (!apptName[1]){
-                    console.log(patientData)
-                    const emailMatch = patientData.filter(p => p.email === appointment.client_email)
-                    if(emailMatch.length){
-                        appointment.client_name = `${appointment.client_name} ${emailMatch[0].last_name}`
-                        console.log(emailMatch)
-                    }
-                    // console.log(appointment);
-                    return true;
-                }
+		.complete {
+			background: rgba(255, 122, 15, 1);
+			color: white;
+			border-color: rgba(255, 122, 15, 1);
+		}
 
-                else {
-                    return false;
-                }
-            }
-        
-            function showData() {
-                const allData = squareData;
-                
-                patientData.forEach(patient => {
-                    squareData.forEach((appointment, sqIdx) => {
-                        if (matchPatient(patient, appointment)){
-                            allData[sqIdx]['matched'] = true;
-                        }
-                    } )
-                })
-                const notMatched = allData.filter(row=> !row.matched)
-                if (notMatched) {
-                    console.log(notMatched)
-                }
-                console.log(allData)
-                //if there's no data about this person, 
-                // if there's no prior record of them, suggest to the user that they might be a new patient and remind them that they need to fill in the spreadsheet (provide link)
-                //if there is prior appointment data for them, tell the user there is an error on their spreadsheet and give them the info
+		#months {
+			padding: 6px 0px 6px 10px;
+			font-family: 'Geneva', sans-serif;
+			font-size: 16px;
+			border-radius: 4px;
+			margin-left: 15px;
+			margin-top: 15px;
+			min-width: 122px;
+		}
 
-            }
-          
+		.upload-btn-wrapper {
+			position: relative;
+			overflow: hidden;
+			display: inline-block;
+			margin-left: 15px;
+			margin-top: 15px;
+		}
 
-        </script>
-    </body>
-</html> 
+		.btn {
+			border: 1px solid gray;
+			color: gray;
+			background-color: white;
+			padding: 8px 20px;
+			border-radius: 4px;
+			font-size: 16px;
+		}
+
+		.success {
+			color: black;
+			background-color: white;
+			padding: 8px 20px;
+			border-radius: 4px;
+			font-size: 16px;
+			border: 1px solid grey;
+			min-width: 122px;
+		}
+
+		.upload-btn-wrapper input[type=file] {
+			font-size: 100px;
+			position: absolute;
+			left: 0;
+			top: 0;
+			opacity: 0;
+		}
+
+		.help-box-square,
+		.help-box-patients {
+			width: 415px;
+			border: 1px solid grey;
+			border-radius: 4px;
+			margin: 15px 25px;
+			padding: 15px;
+		}
+
+		#hide {
+			display: none;
+		}
+
+		#show {
+			display: 'flex';
+		}
+
+		h3.help-title {
+			color: #ff7a0f;
+		}
+
+		.help-list {
+			padding-inline-start: 15px;
+		}
+	</style>
+</head>
+
+<body>
+	<div class="header">
+		<h3 class="header">Hi Susan,</h3>
+		<h2 class="header">Welcome to your monthly patient tally.</h2>
+	</div>
+	<div class="container">
+		<div class="progress">
+			<div class="vert-line"></div>
+			<div class="bubble-container">
+				<div class="active" id="m">
+					<p className="stepLabel">1</p>
+				</div>
+				<div class="incomplete" id="square">
+					<p className="stepLabel">2</p>
+				</div>
+				<div class="incomplete" id="patients">
+					<p className="stepLabel">3</p>
+				</div>
+			</div>
+		</div>
+		<div class="steps">
+			<div class="step">
+				<div class="step-header" id="1">
+					<h2 class="step-header">Select billing month</h2>
+				</div>
+				<select name="months" id="months" onchange="updateBubble('m')">
+					<option> </option>
+					<option value="0">January</option>
+					<option value="1">February</option>
+					<option value="2">March</option>
+					<option value="3">April</option>
+					<option value="4">May</option>
+					<option value="5">June</option>
+					<option value="6">July</option>
+					<option value="7">August</option>
+					<option value="8">September</option>
+					<option value="9">October</option>
+					<option value="10">November</option>
+					<option value="11">December</option>
+				</select>
+				<br />
+			</div>
+			<div class="step">
+				<div class="step-header" id="2">
+					<h2 class="step-header">Upload file from Square</h2>
+					<button class="help-btn" id="square" onclick='showBox("square")'>?</button>
+				</div>
+				<div class="upload-btn-wrapper">
+					<button class="btn" id="square">Choose file</button>
+					<input type="file" id="uploader" name="square" accept=".csv" onchange='read(this)' />
+				</div>
+				<br />
+			</div>
+
+			<div class="step">
+				<div class="step-header" id="3">
+					<h2 class="step-header">Upload patient data file</h2>
+					<button class="help-btn" id="patients" onclick='showBox("patients")'>?</button>
+				</div>
+				<div class="upload-btn-wrapper">
+					<button class="btn" id="patients">Choose file</button>
+					<input type="file" id="uploader" name="patients" accept=".csv" onchange='read(this)' />
+				</div>
+				<br />
+			</div>
+		</div>
+		<div class="help-box-square" id="hide">
+			<h3 class="help-title">How to: Upload file from Square</h3>
+			<ul class="help-list">
+				<li>Go to <a href="https://squareup.com/appointments/business/history">Square Appointment History</a> <br />(you
+					might
+					need to log in)</li>
+				<li> In the upper right corner, just above the table, click the "Export" button.</li>
+				<li>This will download a file - it will be named something like "appointments-[number].csv".</li>
+				<li>Here (in your patient tally app), in Step 2, click on the "Choose file" button.</li>
+				<li>Select the file you just downloaded from Square.</li>
+			</ul>
+		</div>
+		<div class="help-box-patients" id="hide">
+			<h3 class="help-title">How to: Upload patient data file</h3>
+			<ul class="help-list">
+				<li>Go to your patient file on<a
+						href="https://docs.google.com/spreadsheets/d/1R6boKrHb-EWGFRxdBWZtmUScdiFe-WfEV-oZ9anCzgw/edit?usp=sharing">
+						Google Sheets</a> <br />(you
+					might
+					need to log in)</li>
+				<li>Add data for any new patients you had this month.</li>
+				<li> Click "File" > "Download" > "Comma-separated values (.csv, current sheet)".</li>
+				<li>This will download a file - it will be named something like "Patient Billing - Sheet1.csv".</li>
+				<li>Here (in your patient tally app), in Step 3, click on the "Choose file" button.</li>
+				<li>Select the file you just downloaded.</li>
+			</ul>
+		</div>
+	</div>
+
+
+	<button onclick='showData()'>Calculate data</button>
+	<script>
+		function month( date ) {
+			return ( new Date( date ).getMonth() )
+		}
+
+		function squareFilter( json ) {
+			const requestedDate = Number( document.querySelector( '#months' ).value );
+			const filteredData = [];
+			let currentDate = requestedDate;
+			let idx = 0;
+			let limit = currentDate === 0 ? 12 : currentDate - 1;
+
+			while ( currentDate !== limit ) {
+				if ( month( json[ idx ].start ) === requestedDate ) filteredData.push( json[ idx ] );
+				idx++;
+				currentDate = month( json[ idx + 1 ].start );
+			}
+			return filteredData;
+		}
+
+
+		function csvJSON( csvText ) {
+			let lines = [];
+			const linesArray = csvText.split( '\n' );
+			// for trimming and deleting extra space 
+			linesArray.forEach( ( e ) => {
+				const row = e.replace( /[\s]+[,]+|[,]+[\s]+/g, ',' ).trim();
+				lines.push( row );
+			} );
+			// for removing empty record
+			lines.splice( lines.length, 1 );
+			const result = [];
+			const headers = lines[ 0 ].split( "," );
+			for ( let i = 1; i < lines.length; i++ ) {
+				const obj = {};
+				const currentline = lines[ i ].split( "," );
+				for ( let j = 0; j < headers.length; j++ ) {
+					obj[ headers[ j ] ] = currentline[ j ];
+				}
+				result.push( obj );
+			}
+			return result;
+		}
+
+		let squareData = {};
+		let patientData = {};
+
+		function updateBtn( id ) {
+			const btn = document.querySelector( `.btn#${ id }` )
+			btn.setAttribute( 'class', 'success' )
+			btn.innerHTML = 'Success!'
+			updateBubble( id )
+			hideBoxes()
+		}
+
+		function updateBubble( id ) {
+			const bubble = document.getElementById( `${ id }` )
+			bubble.setAttribute( 'class', 'complete' )
+			bubble.firstElementChild.innerText = '✓'
+			if ( id !== 'patients' ) {
+				const next = id === 'm' ? 'square' : 'patients'
+				const nextBubble = document.getElementById( `${ next }` )
+				nextBubble.setAttribute( 'class', `active` )
+			}
+		}
+
+		function read( input ) {
+			const csv = input.files[ 0 ]
+			const reader = new FileReader();
+
+			reader.readAsText( csv );
+			reader.onload = function () {
+				const text = reader.result;
+				updateBtn( input.name );
+				const csvToJson = csvJSON( text );
+				if ( input.name === "square" ) {
+					squareData = squareFilter( csvToJson );
+				} else patientData = csvToJson;
+			}
+		}
+
+		function includeEachOther( first, second ) {
+			return ( first.includes( second ) || second.includes( first ) )
+		}
+
+		function standardizeFirst( string ) {
+			return ( string.toLowerCase().trim() )
+		}
+
+		function standardizeLast( string ) {
+			return ( string.toLowerCase().trim().replace( '-', ' ' ) )
+		}
+
+		function matchPatient( record, appointment ) {
+			//from the patient record
+			firstName = standardizeFirst( record.first_name )
+			lastName = standardizeLast( record.last_name )
+			if ( record.alternate_name ) altName = standardizeFirst( record.alternate_name )
+
+			//from the appointment (info usually entered by client)
+			let apptName = standardizeLast( appointment.client_name ).split( ' ' )
+
+			//perfect match
+			if ( firstName === apptName[ 0 ] && lastName === apptName[ 1 ] ) {
+				return true;
+			}
+			//multiple last names
+			else if ( includeEachOther( apptName, lastName ) || ( apptName[ 2 ] && ( lastName.replace( /\W/, '' ) === [ apptName[ 1 ], apptName[ 2 ] ].join( '' ) ) ) ) {
+				return true;
+			}
+			else if ( lastName.split( ' ' ).length > 1 && lastName.split( ' ' ).includes( apptName[ 1 ] ) ) {
+				return true;
+			}
+			//partial name 
+			else if ( lastName == apptName[ 1 ] && includeEachOther( apptName[ 0 ], firstName ) ) {
+				return true;
+			}
+			// alternate name
+			else if ( lastName == apptName[ 1 ] && altName && includeEachOther( apptName[ 0 ], altName ) ) {
+				return true;
+			}
+			// no last name - use email to confirm identity
+			else if ( !apptName[ 1 ] ) {
+				console.log( patientData )
+				const emailMatch = patientData.filter( p => p.email === appointment.client_email )
+				if ( emailMatch.length ) {
+					appointment.client_name = `${ appointment.client_name } ${ emailMatch[ 0 ].last_name }`
+					console.log( emailMatch )
+				}
+				// console.log(appointment);
+				return true;
+			}
+
+			else {
+				return false;
+			}
+		}
+
+		function showBox( id ) {
+			const box = document.querySelector( `.help-box-${ id }` )
+			const otherId = id === 'square' ? 'patients' : 'square'
+			const otherBox = document.querySelector( `.help-box-${ otherId }` )
+			box.setAttribute( "id", "show" )
+			if ( otherBox.id === 'show' ) {
+				otherBox.setAttribute( "id", "hide" )
+			}
+		}
+
+		function hideBoxes() {
+			const squareHelp = document.querySelector( `.help-box-square` )
+			const patientHelp = document.querySelector( `.help-box-patients` )
+			squareHelp.setAttribute( "id", "hide" )
+			patientHelp.setAttribute( "id", "hide" )
+		}
+
+		function showData() {
+			const allData = squareData;
+
+			patientData.forEach( patient => {
+				squareData.forEach( ( appointment, sqIdx ) => {
+					if ( matchPatient( patient, appointment ) ) {
+						allData[ sqIdx ][ 'matched' ] = true;
+					}
+				} )
+			} )
+			const notMatched = allData.filter( row => !row.matched )
+			if ( notMatched ) {
+				console.log( notMatched )
+			}
+			console.log( allData )
+			//if there's no data about this person, 
+			// if there's no prior record of them, suggest to the user that they might be a new patient and remind them that they need to fill in the spreadsheet (provide link)
+			//if there is prior appointment data for them, tell the user there is an error on their spreadsheet and give them the info
+
+		}
+
+
+	</script>
+</body>
+
+</html>
