@@ -34,15 +34,21 @@
 
 		.step {
 			margin: 15px;
-			border: 1px solid grey;
 			border-radius: 4px;
 			padding: 5px;
 			min-height: 120px;
 			min-width: 400px;
 		}
 
+		.step#inactive {
+			border: 1px solid lightgrey;
+		}
+
+		.step#active {
+			border: 2px solid #ff7a0f;
+		}
+
 		.step-header {
-			color: #ff7a0f;
 			margin: 3px 5px 5px 5px;
 			font-weight: bold;
 			display: flex;
@@ -50,13 +56,30 @@
 			align-items: center;
 		}
 
-		.help-btn {
+		h2#header-active {
+			color: #ff7a0f;
+		}
+
+		h2#header-inactive {
+			color: #ff7a0f78;
+		}
+
+		.help-btn-inactive {
 			border-radius: 50%;
 			height: 25px;
 			width: 25px;
 			border: none;
-			background-color: #ff7a0f;
+			background-color: #ff7a0f78;
 			color: white;
+		}
+
+		.help-btn-active {
+			background-color: #ff7a0f;
+			height: 25px;
+			width: 25px;
+			border: none;
+			color: white;
+			border-radius: 50%;
 		}
 
 		.container {
@@ -106,15 +129,16 @@
 		}
 
 		.active {
-			background: #ffd23d;
+			background: #ff7a0f;
 			color: white;
-			border-color: #ffd23d;
+			border-color: #ff7a0f;
 		}
 
 		.complete {
-			background: rgba(255, 122, 15, 1);
-			color: white;
-			border-color: rgba(255, 122, 15, 1);
+			background: #f3b27f;
+			color: #ff7a0f;
+			border-color: #ff7a0f78;
+			font-size: 23px;
 		}
 
 		#months {
@@ -165,6 +189,7 @@
 		.help-box-square,
 		.help-box-patients {
 			width: 415px;
+			min-width: 415px;
 			border: 1px solid grey;
 			border-radius: 4px;
 			margin: 15px 25px;
@@ -185,6 +210,10 @@
 
 		.help-list {
 			padding-inline-start: 15px;
+		}
+
+		.selected {
+			color: #ababab;
 		}
 	</style>
 </head>
@@ -210,11 +239,11 @@
 			</div>
 		</div>
 		<div class="steps">
-			<div class="step">
+			<div class="step m" id="active">
 				<div class="step-header" id="1">
-					<h2 class="step-header">Select billing month</h2>
+					<h2 class="step-header" id="header-active">Select billing month</h2>
 				</div>
-				<select name="months" id="months" onchange="updateBubble('m')">
+				<select name="months" id="months" onchange="nextStep('m')">
 					<option> </option>
 					<option value="0">January</option>
 					<option value="1">February</option>
@@ -231,10 +260,10 @@
 				</select>
 				<br />
 			</div>
-			<div class="step">
+			<div class="step square" id="inactive">
 				<div class="step-header" id="2">
-					<h2 class="step-header">Upload file from Square</h2>
-					<button class="help-btn" id="square" onclick='showBox("square")'>?</button>
+					<h2 class="step-header square" id="header-inactive">Upload file from Square</h2>
+					<button class="help-btn-inactive" id="square" onclick='showBox("square")'>?</button>
 				</div>
 				<div class="upload-btn-wrapper">
 					<button class="btn" id="square">Choose file</button>
@@ -243,10 +272,10 @@
 				<br />
 			</div>
 
-			<div class="step">
+			<div class="step patients" id="inactive">
 				<div class="step-header" id="3">
-					<h2 class="step-header">Upload patient data file</h2>
-					<button class="help-btn" id="patients" onclick='showBox("patients")'>?</button>
+					<h2 class="step-header patients" id="header-inactive">Upload patient data file</h2>
+					<button class="help-btn-inactive" id="patients" onclick='showBox("patients")'>?</button>
 				</div>
 				<div class="upload-btn-wrapper">
 					<button class="btn" id="patients">Choose file</button>
@@ -337,19 +366,52 @@
 			const btn = document.querySelector( `.btn#${ id }` )
 			btn.setAttribute( 'class', 'success' )
 			btn.innerHTML = 'Success!'
-			updateBubble( id )
-			hideBoxes()
 		}
 
 		function updateBubble( id ) {
+			const next = id === 'm' ? 'square' : 'patients'
 			const bubble = document.getElementById( `${ id }` )
 			bubble.setAttribute( 'class', 'complete' )
 			bubble.firstElementChild.innerText = '✓'
 			if ( id !== 'patients' ) {
-				const next = id === 'm' ? 'square' : 'patients'
 				const nextBubble = document.getElementById( `${ next }` )
 				nextBubble.setAttribute( 'class', `active` )
 			}
+		}
+
+		function updateHeader( id ) {
+			const nextId = id === 'm' ? 'square' : 'patients'
+			//title
+			const currentHeader = document.querySelector( '#header-active' )
+			const nextHeaderElement = document.querySelector( `#header-inactive.${ nextId }` )
+			currentHeader.setAttribute( 'id', 'header-inactive' )
+			if ( id !== 'patients' ) nextHeaderElement.setAttribute( 'id', 'header-active' )
+			//help button
+			const currentHelpButton = document.querySelector( `#${ id }.help-btn-active` )
+			const nextHelpButton = document.querySelector( `#${ nextId }.help-btn-inactive` )
+			if ( currentHelpButton ) currentHelpButton.setAttribute( 'class', 'help-btn-inactive' )
+			if ( id !== 'patients' ) nextHelpButton.setAttribute( 'class', 'help-btn-active' )
+		}
+
+		function updateBox( id ) {
+			const nextId = id === 'm' ? 'square' : 'patients'
+			const currentBox = document.querySelector( `.step.${ id }#active` )
+			const nextBox = document.querySelector( `.step.${ nextId }#inactive` )
+			currentBox.setAttribute( 'id', 'inactive' )
+			if ( id !== 'patients' ) nextBox.setAttribute( 'id', 'active' )
+		}
+
+		function nextStep( id ) {
+			if ( id === 'm' ) {
+				const selectBox = document.querySelector( '#months' )
+				selectBox.setAttribute( 'class', 'selected' )
+				selectBox.blur()
+			}
+			if ( id !== 'm' ) updateBtn( id )
+			updateBubble( id )
+			updateHeader( id )
+			updateBox( id )
+			hideHelpBoxes()
 		}
 
 		function read( input ) {
@@ -359,7 +421,7 @@
 			reader.readAsText( csv );
 			reader.onload = function () {
 				const text = reader.result;
-				updateBtn( input.name );
+				nextStep( input.name );
 				const csvToJson = csvJSON( text );
 				if ( input.name === "square" ) {
 					squareData = squareFilter( csvToJson );
@@ -434,7 +496,7 @@
 			}
 		}
 
-		function hideBoxes() {
+		function hideHelpBoxes() {
 			const squareHelp = document.querySelector( `.help-box-square` )
 			const patientHelp = document.querySelector( `.help-box-patients` )
 			squareHelp.setAttribute( "id", "hide" )
